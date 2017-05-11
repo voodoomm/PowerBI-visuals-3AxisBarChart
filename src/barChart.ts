@@ -132,6 +132,7 @@ module powerbi.extensibility.visual {
         return {
             dataPoints: barChartDataPoints,
             dataMax: dataMax,
+            dataMax2: dataMax2,
             settings: barChartSettings,
         };
     }
