@@ -9,6 +9,7 @@ module powerbi.extensibility.visual {
     interface BarChartViewModel {
         dataPoints: BarChartDataPoint[];
         dataMax: number;
+        dataMax2: number;
         settings: BarChartSettings;
     };
 
@@ -25,6 +26,7 @@ module powerbi.extensibility.visual {
     interface BarChartDataPoint {
         value: PrimitiveValue;
         category: string;
+        vaxis: number;
         color: string;
         selectionId: ISelectionId;
     };
@@ -67,6 +69,7 @@ module powerbi.extensibility.visual {
         let viewModel: BarChartViewModel = {
             dataPoints: [],
             dataMax: 0,
+            dataMax2: 0,
             settings: <BarChartSettings>{}
         };
 
@@ -81,9 +84,11 @@ module powerbi.extensibility.visual {
         let categorical = dataViews[0].categorical;
         let category = categorical.categories[0];
         let dataValue = categorical.values[0];
+        let dataValue2 = categorical.values[1];
 
         let barChartDataPoints: BarChartDataPoint[] = [];
         let dataMax: number;
+        let dataMax2: number;
 
         let colorPalette: IColorPalette = host.colorPalette;
         let objects = dataViews[0].metadata.objects;
@@ -105,13 +110,24 @@ module powerbi.extensibility.visual {
             barChartDataPoints.push({
                 category: category.values[i] + '',
                 value: dataValue.values[i],
+                vaxis: 1,  //first axis
                 color: colorPalette.getColor(1 + '').value,  //getCategoricalObjectValue<Fill>(category, i, 'colorSelector', 'fill', defaultColor).solid.color,
                 selectionId: host.createSelectionIdBuilder()
                     .withCategory(category, i)
                     .createSelectionId()
             });
+            barChartDataPoints.push({
+                category: category.values[i] + '',
+                value: dataValue2.values[i],
+                vaxis: 2,  //second axis
+                color: colorPalette.getColor(2 + '').value,  //getCategoricalObjectValue<Fill>(category, i, 'colorSelector', 'fill', defaultColor).solid.color,
+                selectionId: host.createSelectionIdBuilder()
+                    .withCategory(category, i + Math.max(category.values.length, dataValue.values.length))
+                    .createSelectionId()
+            });
         }
         dataMax = <number>dataValue.maxLocal;
+        dataMax2 = <number>dataValue2.maxLocal * 1.2;  //second axis
 
         return {
             dataPoints: barChartDataPoints,
@@ -127,6 +143,8 @@ module powerbi.extensibility.visual {
         private barChartContainer: d3.Selection<SVGElement>;
         private barContainer: d3.Selection<SVGElement>;
         private xAxis: d3.Selection<SVGElement>;
+        private yAxis: d3.Selection<SVGElement>;
+        private yAxis2: d3.Selection<SVGElement>;
         private barDataPoints: BarChartDataPoint[];
         private barChartSettings: BarChartSettings;
         private tooltipServiceWrapper: ITooltipServiceWrapper;
@@ -142,7 +160,7 @@ module powerbi.extensibility.visual {
                 bottom: 25,
                 left: 30,
             },
-            xAxisFontMultiplier: 0.04,
+            xAxisFontMultiplier: 0.02,
         };
 
         /**
@@ -168,6 +186,10 @@ module powerbi.extensibility.visual {
 
             this.xAxis = svg.append('g')
                 .classed('xAxis', true);
+            this.yAxis = svg.append('g')
+                .classed('yAxis', true);
+            this.yAxis2 = svg.append('g')
+                .classed('yAxis', true);
         }
 
         /**
@@ -199,9 +221,18 @@ module powerbi.extensibility.visual {
             this.xAxis.style({
                 'font-size': d3.min([height, width]) * BarChart.Config.xAxisFontMultiplier,
             });
+            this.yAxis.style({
+                'font-size': d3.min([height, width]) * BarChart.Config.xAxisFontMultiplier,
+            });
+            this.yAxis2.style({
+                'font-size': d3.min([height, width]) * BarChart.Config.xAxisFontMultiplier,
+            });
 
             let yScale = d3.scale.linear()
                 .domain([0, viewModel.dataMax])
+                .range([height, 0]);
+            let yScale2 = d3.scale.linear()
+                .domain([0, viewModel.dataMax2])
                 .range([height, 0]);
 
             let xScale = d3.scale.ordinal()
@@ -215,16 +246,28 @@ module powerbi.extensibility.visual {
             this.xAxis.attr('transform', 'translate(0, ' + height + ')')
                 .call(xAxis);
 
+            let yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient('right');
+            this.yAxis.attr('transform', 'translate(0, 0)')
+                .call(yAxis);
+
+            let yAxis2 = d3.svg.axis()
+                .scale(yScale2)
+                .orient('left');
+            this.yAxis2.attr('transform', 'translate('+ width +', 0)')
+                .call(yAxis2);
+
             let bars = this.barContainer.selectAll('.bar').data(viewModel.dataPoints);
             bars.enter()
                 .append('rect')
                 .classed('bar', true);
 
             bars.attr({
-                width: xScale.rangeBand(),
-                height: d => height - yScale(<number>d.value),
-                y: d => yScale(<number>d.value),
-                x: d => xScale(d.category),
+                width: d => xScale.rangeBand() / d.vaxis,
+                height: d => height - ((d.vaxis - 1) * yScale2(<number>d.value)) - ((d.vaxis - 2) * -1 * yScale(<number>d.value)),
+                y: d => ((d.vaxis - 1) * yScale2(<number>d.value)) + ((d.vaxis - 2) * -1 * yScale(<number>d.value)),
+                x: d => xScale(d.category) + (xScale.rangeBand() / 4) * (d.vaxis -1),
                 fill: d => d.color,
                 'fill-opacity': viewModel.settings.generalView.opacity / 100
             });
