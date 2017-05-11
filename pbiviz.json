@@ -1,13 +1,13 @@
 {
   "visual": {
-    "name": "Bar Chart",
-    "displayName": "barChart",
+    "name": "3Axis Bar Chart",
+    "displayName": "3ABarChart",
     "guid": "PBI_CV_9894B302_1DFF_4A96_ABFE_BF8588197166",
     "visualClassName": "BarChart",
     "version": "1.0.0",
     "description": "",
     "supportUrl": "",
-    "gitHubUrl": ""
+    "gitHubUrl": "https://github.com/voodoomm/PowerBI-visuals-3AxisBarChart"
   },
   "apiVersion": "1.5.0",
   "author": {
