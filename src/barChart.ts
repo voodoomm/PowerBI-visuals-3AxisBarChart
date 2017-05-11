@@ -58,7 +58,7 @@ module powerbi.extensibility.visual {
         let dataViews = options.dataViews;
         let defaultSettings: BarChartSettings = {
             enableAxis: {
-                show: false,
+                show: true,
             },
             generalView: {
                 opacity: 100
@@ -105,7 +105,7 @@ module powerbi.extensibility.visual {
             barChartDataPoints.push({
                 category: category.values[i] + '',
                 value: dataValue.values[i],
-                color: getCategoricalObjectValue<Fill>(category, i, 'colorSelector', 'fill', defaultColor).solid.color,
+                color: colorPalette.getColor(1 + '').value,  //getCategoricalObjectValue<Fill>(category, i, 'colorSelector', 'fill', defaultColor).solid.color,
                 selectionId: host.createSelectionIdBuilder()
                     .withCategory(category, i)
                     .createSelectionId()
@@ -280,7 +280,7 @@ module powerbi.extensibility.visual {
                     });
                     break;
                 case 'colorSelector':
-                    for (let barDataPoint of this.barDataPoints) {
+                    /*for (let barDataPoint of this.barDataPoints) {
                         objectEnumeration.push({
                             objectName: objectName,
                             displayName: barDataPoint.category,
@@ -293,7 +293,7 @@ module powerbi.extensibility.visual {
                             },
                             selector: barDataPoint.selectionId
                         });
-                    }
+                    }*/
                     break;
                 case 'generalView':
                     objectEnumeration.push({
