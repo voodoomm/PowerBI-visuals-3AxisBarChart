@@ -74,6 +74,12 @@
                     "type": {
                         "integer": true
                     }
+                },
+                "y2trim": {
+                    "displayName": "Scale Trim",
+                    "type": {
+                        "integer": true
+                    }
                 }
             }
         }

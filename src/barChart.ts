@@ -44,6 +44,7 @@ module powerbi.extensibility.visual {
 
         generalView: {
             opacity: number;
+            y2trim: number;
         };
     }
 
@@ -63,7 +64,8 @@ module powerbi.extensibility.visual {
                 show: true,
             },
             generalView: {
-                opacity: 100
+                opacity: 100,
+                y2trim: 120
             }
         };
         let viewModel: BarChartViewModel = {
@@ -98,6 +100,7 @@ module powerbi.extensibility.visual {
             },
             generalView: {
                 opacity: getValue<number>(objects, 'generalView', 'opacity', defaultSettings.generalView.opacity),
+                y2trim: getValue<number>(objects, 'generalView', 'y2trim', defaultSettings.generalView.y2trim),
             }
         };
         for (let i = 0, len = Math.max(category.values.length, dataValue.values.length); i < len; i++) {
@@ -127,7 +130,7 @@ module powerbi.extensibility.visual {
             });
         }
         dataMax = <number>dataValue.maxLocal;
-        dataMax2 = <number>dataValue2.maxLocal * 1.2;  //second axis
+        dataMax2 = <number>dataValue2.maxLocal;  // * 1.2;  //second axis
 
         return {
             dataPoints: barChartDataPoints,
@@ -233,7 +236,7 @@ module powerbi.extensibility.visual {
                 .domain([0, viewModel.dataMax])
                 .range([height, 0]);
             let yScale2 = d3.scale.linear()
-                .domain([0, viewModel.dataMax2])
+                .domain([0, viewModel.dataMax2 * (viewModel.settings.generalView.y2trim / 100)])
                 .range([height, 0]);
 
             let xScale = d3.scale.ordinal()
@@ -344,12 +347,19 @@ module powerbi.extensibility.visual {
                         objectName: objectName,
                         properties: {
                             opacity: this.barChartSettings.generalView.opacity,
+                            y2trim: this.barChartSettings.generalView.y2trim,
                         },
                         validValues: {
                             opacity: {
                                 numberRange: {
                                     min: 10,
                                     max: 100
+                                }
+                            },
+                            y2trim: {
+                                numberRange: {
+                                    min: 50,
+                                    max: 150
                                 }
                             }
                         },
@@ -377,7 +387,7 @@ module powerbi.extensibility.visual {
                 displayName: value.category,
                 value: value.value.toString(),
                 color: value.color,
-                header: language && "displayed language " + language
+                header: ""  //language && "displayed language " + language
             }];
         }
     }
