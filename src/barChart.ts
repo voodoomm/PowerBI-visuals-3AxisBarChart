@@ -101,13 +101,23 @@ module powerbi.extensibility.visual {
 
         let colorPalette: IColorPalette = host.colorPalette;
         let objects = dataViews[0].metadata.objects;
+        let defaultColor1: Fill = {
+                solid: {
+                    color: defaultSettings.colorSelector.color1
+                }
+            };
+        let defaultColor2: Fill = {
+                solid: {
+                    color: defaultSettings.colorSelector.color2
+                }
+            };
         let barChartSettings: BarChartSettings = {
             enableAxis: {
                 show: getValue<boolean>(objects, 'enableAxis', 'show', defaultSettings.enableAxis.show),
             },
             colorSelector: {
-                color1: getValue<Fill>(objects, 'colorSelector', 'fill', defaultSettings.colorSelector.color1).solid.color,
-                color2: getValue<Fill>(objects, 'colorSelector', 'fill2', defaultSettings.colorSelector.color2).solid.color,
+                color1: getValue<Fill>(objects, 'colorSelector', 'fill', defaultColor1).solid.color,
+                color2: getValue<Fill>(objects, 'colorSelector', 'fill2', defaultColor2).solid.color,
             },
             generalView: {
                 opacity: getValue<number>(objects, 'generalView', 'opacity', defaultSettings.generalView.opacity),
