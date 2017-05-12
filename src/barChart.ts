@@ -41,7 +41,10 @@ module powerbi.extensibility.visual {
         enableAxis: {
             show: boolean;
         };
-
+        colorSelector: {
+            color1: string;
+            color2: string;
+        };
         generalView: {
             opacity: number;
             y2trim: number;
@@ -62,6 +65,10 @@ module powerbi.extensibility.visual {
         let defaultSettings: BarChartSettings = {
             enableAxis: {
                 show: true,
+            },
+            colorSelector: {
+                color1: host.colorPalette.getColor(1 + '').value,
+                color2: host.colorPalette.getColor(2 + '').value
             },
             generalView: {
                 opacity: 100,
@@ -98,6 +105,10 @@ module powerbi.extensibility.visual {
             enableAxis: {
                 show: getValue<boolean>(objects, 'enableAxis', 'show', defaultSettings.enableAxis.show),
             },
+            colorSelector: {
+                color1: getValue<Fill>(objects, 'colorSelector', 'fill', defaultSettings.colorSelector.color1).solid.color,
+                color2: getValue<Fill>(objects, 'colorSelector', 'fill2', defaultSettings.colorSelector.color2).solid.color,
+            },
             generalView: {
                 opacity: getValue<number>(objects, 'generalView', 'opacity', defaultSettings.generalView.opacity),
                 y2trim: getValue<number>(objects, 'generalView', 'y2trim', defaultSettings.generalView.y2trim),
@@ -114,7 +125,7 @@ module powerbi.extensibility.visual {
                 category: category.values[i] + '',
                 value: dataValue.values[i],
                 vaxis: 1,  //first axis
-                color: colorPalette.getColor(1 + '').value,  //getCategoricalObjectValue<Fill>(category, i, 'colorSelector', 'fill', defaultColor).solid.color,
+                color: barChartSettings.colorSelector.color1,  //colorPalette.getColor(1 + '').value,  //getCategoricalObjectValue<Fill>(category, i, 'colorSelector', 'fill', defaultColor).solid.color,
                 selectionId: host.createSelectionIdBuilder()
                     .withCategory(category, i)
                     .createSelectionId()
@@ -123,9 +134,9 @@ module powerbi.extensibility.visual {
                 category: category.values[i] + '',
                 value: dataValue2.values[i],
                 vaxis: 2,  //second axis
-                color: colorPalette.getColor(2 + '').value,  //getCategoricalObjectValue<Fill>(category, i, 'colorSelector', 'fill', defaultColor).solid.color,
+                color: barChartSettings.colorSelector.color2,  //colorPalette.getColor(2 + '').value,  //getCategoricalObjectValue<Fill>(category, i, 'colorSelector', 'fill', defaultColor).solid.color,
                 selectionId: host.createSelectionIdBuilder()
-                    .withCategory(category, i + Math.max(category.values.length, dataValue.values.length))
+                    .withCategory(category, i) // + Math.max(category.values.length, dataValue.values.length))
                     .createSelectionId()
             });
         }
@@ -233,7 +244,7 @@ module powerbi.extensibility.visual {
             });
 
             let yScale = d3.scale.linear()
-                .domain([0, viewModel.dataMax])
+                .domain([0, viewModel.dataMax * (2 - (viewModel.settings.generalView.y2trim / 100))])
                 .range([height, 0]);
             let yScale2 = d3.scale.linear()
                 .domain([0, viewModel.dataMax2 * (viewModel.settings.generalView.y2trim / 100)])
@@ -252,12 +263,14 @@ module powerbi.extensibility.visual {
 
             let yAxis = d3.svg.axis()
                 .scale(yScale)
+                .tickSize(0)
                 .orient('right');
             this.yAxis.attr('transform', 'translate(0, 0)')
                 .call(yAxis);
 
             let yAxis2 = d3.svg.axis()
                 .scale(yScale2)
+                .tickSize(0)
                 .orient('left');
             this.yAxis2.attr('transform', 'translate('+ width +', 0)')
                 .call(yAxis2);
@@ -341,6 +354,24 @@ module powerbi.extensibility.visual {
                             selector: barDataPoint.selectionId
                         });
                     }*/
+                    objectEnumeration.push({
+                        objectName: objectName,
+                        displayName: "Colors",
+                        properties: {
+                            fill: {
+                                solid: {
+                                    color: this.barChartSettings.colorSelector.color1
+                                }
+                            },
+                            fill2: {
+                                solid: {
+                                    color: this.barChartSettings.colorSelector.color2
+                                }
+                            }
+                        },
+                        selector: null
+                    });
+                    
                     break;
                 case 'generalView':
                     objectEnumeration.push({

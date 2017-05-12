@@ -55,7 +55,17 @@
             "displayName": "Data Colors",
             "properties": {
                 "fill": {
-                    "displayName": "Color",
+                    "displayName": "Color 1",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "fill2": {
+                    "displayName": "Color 2",
                     "type": {
                         "fill": {
                             "solid": {
