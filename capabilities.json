@@ -73,6 +73,26 @@
                             }
                         }
                     }
+                },
+                "xaxes": {
+                    "displayName": "X Axis Color",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "yaxes": {
+                    "displayName": "Y Axis Color",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
                 }
             }
         },

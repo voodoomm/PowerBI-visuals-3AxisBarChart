@@ -44,6 +44,8 @@ module powerbi.extensibility.visual {
         colorSelector: {
             color1: string;
             color2: string;
+            color3: string;
+            color4: string;
         };
         generalView: {
             opacity: number;
@@ -68,7 +70,9 @@ module powerbi.extensibility.visual {
             },
             colorSelector: {
                 color1: host.colorPalette.getColor(1 + '').value,
-                color2: host.colorPalette.getColor(2 + '').value
+                color2: host.colorPalette.getColor(2 + '').value,
+                color3: 'black',
+                color4: 'black'
             },
             generalView: {
                 opacity: 100,
@@ -111,6 +115,16 @@ module powerbi.extensibility.visual {
                     color: defaultSettings.colorSelector.color2
                 }
             };
+        let defaultColor3: Fill = {
+                solid: {
+                    color: defaultSettings.colorSelector.color3
+                }
+            };
+        let defaultColor4: Fill = {
+                solid: {
+                    color: defaultSettings.colorSelector.color4
+                }
+            };
         let barChartSettings: BarChartSettings = {
             enableAxis: {
                 show: getValue<boolean>(objects, 'enableAxis', 'show', defaultSettings.enableAxis.show),
@@ -118,6 +132,8 @@ module powerbi.extensibility.visual {
             colorSelector: {
                 color1: getValue<Fill>(objects, 'colorSelector', 'fill', defaultColor1).solid.color,
                 color2: getValue<Fill>(objects, 'colorSelector', 'fill2', defaultColor2).solid.color,
+                color3: getValue<Fill>(objects, 'colorSelector', 'xaxes', defaultColor3).solid.color,
+                color4: getValue<Fill>(objects, 'colorSelector', 'yaxes', defaultColor4).solid.color,
             },
             generalView: {
                 opacity: getValue<number>(objects, 'generalView', 'opacity', defaultSettings.generalView.opacity),
@@ -185,7 +201,7 @@ module powerbi.extensibility.visual {
                 bottom: 25,
                 left: 30,
             },
-            xAxisFontMultiplier: 0.02,
+            xAxisFontMultiplier: 0.04,
         };
 
         /**
@@ -245,12 +261,15 @@ module powerbi.extensibility.visual {
 
             this.xAxis.style({
                 'font-size': d3.min([height, width]) * BarChart.Config.xAxisFontMultiplier,
+                'fill': viewModel.settings.colorSelector.color3,
             });
             this.yAxis.style({
                 'font-size': d3.min([height, width]) * BarChart.Config.xAxisFontMultiplier,
+                'fill': viewModel.settings.colorSelector.color4,
             });
             this.yAxis2.style({
                 'font-size': d3.min([height, width]) * BarChart.Config.xAxisFontMultiplier,
+                'fill': viewModel.settings.colorSelector.color4,
             });
 
             let yScale = d3.scale.linear()
@@ -376,6 +395,16 @@ module powerbi.extensibility.visual {
                             fill2: {
                                 solid: {
                                     color: this.barChartSettings.colorSelector.color2
+                                }
+                            },
+                            xaxes: {
+                                solid: {
+                                    color: this.barChartSettings.colorSelector.color3
+                                }
+                            },
+                            yaxes: {
+                                solid: {
+                                    color: this.barChartSettings.colorSelector.color4
                                 }
                             }
                         },
