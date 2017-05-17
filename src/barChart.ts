@@ -273,10 +273,10 @@ module powerbi.extensibility.visual {
             });
 
             let yScale = d3.scale.linear()
-                .domain([0, viewModel.dataMax * (2 - (viewModel.settings.generalView.y2trim / 100))])
+                .domain([0, viewModel.dataMax * (viewModel.settings.generalView.y2trim < 100 ? (2 - (viewModel.settings.generalView.y2trim / 100)) : 1)])
                 .range([height, 0]);
             let yScale2 = d3.scale.linear()
-                .domain([0, viewModel.dataMax2 * (viewModel.settings.generalView.y2trim / 100)])
+                .domain([0, viewModel.dataMax2 * (viewModel.settings.generalView.y2trim > 100 ? (viewModel.settings.generalView.y2trim / 100) : 1)])
                 .range([height, 0]);
 
             let xScale = d3.scale.ordinal()
