@@ -106,24 +106,16 @@ module powerbi.extensibility.visual {
         let colorPalette: IColorPalette = host.colorPalette;
         let objects = dataViews[0].metadata.objects;
         let defaultColor1: Fill = {
-                solid: {
-                    color: defaultSettings.colorSelector.color1
-                }
+                solid: { color: defaultSettings.colorSelector.color1 }
             };
         let defaultColor2: Fill = {
-                solid: {
-                    color: defaultSettings.colorSelector.color2
-                }
+                solid: { color: defaultSettings.colorSelector.color2 }
             };
         let defaultColor3: Fill = {
-                solid: {
-                    color: defaultSettings.colorSelector.color3
-                }
+                solid: { color: defaultSettings.colorSelector.color3 }
             };
         let defaultColor4: Fill = {
-                solid: {
-                    color: defaultSettings.colorSelector.color4
-                }
+                solid: { color: defaultSettings.colorSelector.color4 }
             };
         let barChartSettings: BarChartSettings = {
             enableAxis: {
@@ -197,9 +189,9 @@ module powerbi.extensibility.visual {
             transparentOpacity: 0.5,
             margins: {
                 top: 0,
-                right: 0,
-                bottom: 25,
-                left: 30,
+                right: 15,  //0,
+                bottom: 25, //25,
+                left: 15,  //30,
             },
             xAxisFontMultiplier: 0.04,
         };
@@ -261,14 +253,18 @@ module powerbi.extensibility.visual {
 
             this.xAxis.style({
                 'font-size': d3.min([height, width]) * BarChart.Config.xAxisFontMultiplier,
+                'font-weight': 'bold',
                 'fill': viewModel.settings.colorSelector.color3,
+                //'writing-mode': 'tb-rl',
             });
             this.yAxis.style({
                 'font-size': d3.min([height, width]) * BarChart.Config.xAxisFontMultiplier,
+                'font-weight': 'bold',
                 'fill': viewModel.settings.colorSelector.color4,
             });
             this.yAxis2.style({
                 'font-size': d3.min([height, width]) * BarChart.Config.xAxisFontMultiplier,
+                'font-weight': 'bold',
                 'fill': viewModel.settings.colorSelector.color4,
             });
 
@@ -281,14 +277,19 @@ module powerbi.extensibility.visual {
 
             let xScale = d3.scale.ordinal()
                 .domain(viewModel.dataPoints.map(d => d.category))
-                .rangeRoundBands([0, width], BarChart.Config.xScalePadding, 0.2);
+                .rangeRoundBands([0, width - (BarChart.Config.margins.left + BarChart.Config.margins.right)], BarChart.Config.xScalePadding, 0.2);
 
             let xAxis = d3.svg.axis()
                 .scale(xScale)
                 .orient('bottom');
 
-            this.xAxis.attr('transform', 'translate(0, ' + height + ')')
-                .call(xAxis);
+            this.xAxis.attr('transform', 'translate(' + BarChart.Config.margins.left + ', ' + height + ')')
+                .call(xAxis)
+                //.selectAll('text') // rotate text
+                //.style('text-anchor', 'end')
+                //.attr('dx', '-.1em')
+                //.attr('dy', '0.4em')
+                //.attr('transform', 'rotate(-45)');
 
             let yAxis = d3.svg.axis()
                 .scale(yScale)
@@ -313,7 +314,7 @@ module powerbi.extensibility.visual {
                 width: d => xScale.rangeBand() / d.vaxis,
                 height: d => height - ((d.vaxis - 1) * yScale2(<number>d.value)) - ((d.vaxis - 2) * -1 * yScale(<number>d.value)),
                 y: d => ((d.vaxis - 1) * yScale2(<number>d.value)) + ((d.vaxis - 2) * -1 * yScale(<number>d.value)),
-                x: d => xScale(d.category) + (xScale.rangeBand() / 4) * (d.vaxis -1),
+                x: d => xScale(d.category) + (xScale.rangeBand() / 4) * (d.vaxis -1) + BarChart.Config.margins.left,
                 fill: d => d.color,
                 'fill-opacity': viewModel.settings.generalView.opacity / 100
             });
@@ -388,24 +389,16 @@ module powerbi.extensibility.visual {
                         displayName: "Colors",
                         properties: {
                             fill: {
-                                solid: {
-                                    color: this.barChartSettings.colorSelector.color1
-                                }
+                                solid: { color: this.barChartSettings.colorSelector.color1 }
                             },
                             fill2: {
-                                solid: {
-                                    color: this.barChartSettings.colorSelector.color2
-                                }
+                                solid: { color: this.barChartSettings.colorSelector.color2 }
                             },
                             xaxes: {
-                                solid: {
-                                    color: this.barChartSettings.colorSelector.color3
-                                }
+                                solid: { color: this.barChartSettings.colorSelector.color3 }
                             },
                             yaxes: {
-                                solid: {
-                                    color: this.barChartSettings.colorSelector.color4
-                                }
+                                solid: { color: this.barChartSettings.colorSelector.color4 }
                             }
                         },
                         selector: null

@@ -1,3 +1,2 @@
 # PowerBI-visuals-3AxisBarChart
-WIP
-
+A simple bar chart visual with two independent Y axes.
